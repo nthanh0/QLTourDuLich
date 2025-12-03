@@ -11,7 +11,7 @@
 ### Bước 1: Tạo Tablespace và User
 ```sql
 -- Kết nối bằng user SYSTEM hoặc SYS
-sqlplus system/password@localhost:1521/or
+sqlplus system/password@localhost:1521/orcl
 ```
 
 Chạy file: `database/create_tablespace_and_users.sql`
@@ -152,5 +152,6 @@ Nếu gặp vấn đề, kiểm tra:
 2. Connection string đúng chưa
 3. User có đủ quyền chưa
 4. File encoding UTF-8 chưa
+
 
 
