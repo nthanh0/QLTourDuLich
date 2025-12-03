@@ -9,10 +9,6 @@
 ### THAY `orcl` THÀNH TÊN INSTANCE ĐANG DÙNG
 
 ### Bước 1: Tạo Tablespace và User
-```sql
--- Kết nối bằng user SYSTEM hoặc SYS
-sqlplus system/password@localhost:1521/orcl
-```
 
 Chạy file: `database/create_tablespace_and_users.sql`
 
@@ -22,10 +18,6 @@ Chạy file: `database/create_tablespace_and_users.sql`
 - Tạo user nhân viên: `user_employee001`, `user_employee002`
 
 ### Bước 2: Tạo Bảng
-```sql
--- Kết nối bằng tour_admin
-sqlplus tour_admin/pwd@localhost:1521/orcl
-```
 
 Chạy file: `database/create_tables.sql`
 
@@ -67,13 +59,6 @@ Sửa file `appsettings.json`:
 ```
 
 ### Bước 6: Chạy Ứng Dụng
-```bash
-dotnet restore
-dotnet build
-dotnet run
-```
-
-Truy cập: `https://localhost:7205` hoặc `http://localhost:5000`
 
 ## Chức Năng Chính
 
@@ -152,6 +137,7 @@ Nếu gặp vấn đề, kiểm tra:
 2. Connection string đúng chưa
 3. User có đủ quyền chưa
 4. File encoding UTF-8 chưa
+
 
 
 
