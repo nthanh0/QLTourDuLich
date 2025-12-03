@@ -1,66 +1,66 @@
-# H? Th?ng Qu?n L� Tour Du L?ch
+# Hệ Thống Quản Lý Tour Du Lịch
 
-## C�ng Ngh?
+## Công Nghệ
 - **Backend**: ASP.NET Core 8.0 (MVC/Razor Pages)
 - **Database**: Oracle Database
 - **ORM**: Oracle.ManagedDataAccess.Core
 
-## H??ng D?n T?o C? S? D? Li?u
+## Hướng Dẫn Tạo Cơ Sở Dữ Liệu
 
-### B??c 1: T?o Tablespace v� User
+### Bước 1: Tạo Tablespace và User
 ```sql
--- K?t n?i b?ng user SYSTEM ho?c SYS
+-- Kết nối bằng user SYSTEM hoặc SYS
 sqlplus system/password@localhost:1521/xe
 ```
 
-Ch?y file: `database/create_tablespace_and_users.sql`
+Chạy file: `database/create_tablespace_and_users.sql`
 
-**N?i dung ch�nh:**
-- T?o tablespace `tour_management` (5MB, t? ??ng m? r?ng ??n 50MB)
-- T?o user `tour_admin` (password: `pwd`) v?i ??y ?? quy?n
-- T?o user nh�n vi�n: `user_employee001`, `user_employee002`
+**Nội dung chính:**
+- Tạo tablespace `tour_management` (5MB, tự động mở rộng đến 50MB)
+- Tạo user `tour_admin` (password: `pwd`) với đầy đủ quyền
+- Tạo user nhân viên: `user_employee001`, `user_employee002`
 
-### B??c 2: T?o B?ng
+### Bước 2: Tạo Bảng
 ```sql
--- K?t n?i b?ng tour_admin
+-- Kết nối bằng tour_admin
 sqlplus tour_admin/pwd@localhost:1521/xe
 ```
 
-Ch?y file: `database/create_tables.sql`
+Chạy file: `database/create_tables.sql`
 
-**T?o 15 b?ng:**
+**Tạo 15 bảng:**
 - `Accounts`, `Customers`, `Employees`, `Tours`, `TourSchedules`
 - `Bookings`, `Bills`, `Locations`, `Services`, `Transports`
 - `Accommodations`, `Itineraries`
 - `Itinerary_Locations`, `Itinerary_Services`, `Itinerary_Accommodations`
 
-### B??c 3: S?a Sequences (n?u c?n)
-Ch?y file: `database/fix_sequences.sql`
+### Bước 3: Sửa Sequences (nếu cần)
+Chạy file: `database/fix_sequences.sql`
 
-??ng b? gi� tr? sequence v?i MAX(ID) trong c�c b?ng.
+Đồng bộ giá trị sequence với MAX(ID) trong các bảng.
 
-### B??c 4: T?o Stored Procedures v� Functions
-Ch?y file: `database/stored_procedures_functions.sql`
+### Bước 4: Tạo Stored Procedures và Functions
+Chạy file: `database/stored_procedures_functions.sql`
 
 **Procedures:**
-- `SP_CreateTour` - T?o tour m?i v?i validation
-- `SP_UpdateTour` - C?p nh?t tour
-- `SP_DeleteTour` - X�a tour (ki?m tra r�ng bu?c)
-- `SP_CreateBooking` - T?o booking (t�nh gi� t? ??ng, gi?m gi� theo s? l??ng)
-- `SP_UpdateBookingStatus` - C?p nh?t tr?ng th�i booking
-- `SP_CreateCustomer` - T?o kh�ch h�ng v?i validation
+- `SP_CreateTour` - Tạo tour mới với validation
+- `SP_UpdateTour` - Cập nhật tour
+- `SP_DeleteTour` - Xóa tour (kiểm tra ràng buộc)
+- `SP_CreateBooking` - Tạo booking (tính giá tự động, giảm giá theo số lượng)
+- `SP_UpdateBookingStatus` - Cập nhật trạng thái booking
+- `SP_CreateCustomer` - Tạo khách hàng với validation
 
 **Functions:**
-- `FN_GetTourRevenue` - T�nh t?ng doanh thu theo tour
-- `FN_CountBookingsByStatus` - ??m booking theo tr?ng th�i
-- `FN_GetAvailableSeats` - Ki?m tra ch? tr?ng
-- `FN_GetCustomerTotalSpent` - T?ng chi ti�u kh�ch h�ng
-- `FN_GetCustomerRank` - X?p h?ng kh�ch h�ng (VIP/Gold/Silver/Bronze)
-- `FN_GetScheduleOccupancyRate` - % c�ng su?t ??t ch?
-- `FN_GetDaysUntilDeparture` - S? ng�y ??n ng�y kh?i h�nh
+- `FN_GetTourRevenue` - Tính tổng doanh thu theo tour
+- `FN_CountBookingsByStatus` - Đếm booking theo trạng thái
+- `FN_GetAvailableSeats` - Kiểm tra chỗ trống
+- `FN_GetCustomerTotalSpent` - Tổng chi tiêu khách hàng
+- `FN_GetCustomerRank` - Xếp hạng khách hàng (VIP/Gold/Silver/Bronze)
+- `FN_GetScheduleOccupancyRate` - % công suất đặt chỗ
+- `FN_GetDaysUntilDeparture` - Số ngày đến ngày khởi hành
 
-### B??c 5: C?u H�nh Connection String
-S?a file `appsettings.json`:
+### Bước 5: Cấu Hình Connection String
+Sửa file `appsettings.json`:
 
 ```json
 {
@@ -70,89 +70,89 @@ S?a file `appsettings.json`:
 }
 ```
 
-### B??c 6: Ch?y ?ng D?ng
+### Bước 6: Chạy Ứng Dụng
 ```bash
 dotnet restore
 dotnet build
 dotnet run
 ```
 
-Truy c?p: `https://localhost:7205` ho?c `http://localhost:5000`
+Truy cập: `https://localhost:7205` hoặc `http://localhost:5000`
 
-## Ch?c N?ng Ch�nh
+## Chức Năng Chính
 
-### 1. Qu?n L� Tour
-- T?o/S?a/X�a tour
+### 1. Quản Lý Tour
+- Tạo/Sửa/Xóa tour
 - Xem doanh thu theo tour
-- Qu?n l� ng??i qu?n l� tour
+- Quản lý người quản lý tour
 
-### 2. Qu?n L� Kh�ch H�ng
-- Th�m/S?a/X�a kh�ch h�ng
-- Xem t?ng chi ti�u v� x?p h?ng
-- Validation email, s? ?i?n tho?i, tu?i (?18)
+### 2. Quản Lý Khách Hàng
+- Thêm/Sửa/Xóa khách hàng
+- Xem tổng chi tiêu và xếp hạng
+- Validation email, số điện thoại, tuổi (≥18)
 
-### 3. Qu?n L� ??t Tour
-- **Th?ng k� theo tr?ng th�i:**
-  - M?i ??t (M?i ??t + Ch? thanh to�n)
-  - ?� X�c Nh?n (?� x�c nh?n + ?� ??t c?c)
-  - Ho�n Th�nh
-- T?o booking t? ??ng t�nh gi� (tr? em -50%)
-- Gi?m gi� theo s? l??ng: 3 ng??i (5%), 5 ng??i (10%), 10 ng??i (15%)
-- Ki?m tra ch? tr?ng
-- C?p nh?t tr?ng th�i v?i validation
+### 3. Quản Lý Đặt Tour
+- **Thống kê theo trạng thái:**
+  - Mới Đặt (Mới đặt + Chờ thanh toán)
+  - Đã Xác Nhận (Đã xác nhận + Đã đặt cọc)
+  - Hoàn Thành
+- Tạo booking tự động tính giá (trẻ em -50%)
+- Giảm giá theo số lượng: 3 người (5%), 5 người (10%), 10 người (15%)
+- Kiểm tra chỗ trống
+- Cập nhật trạng thái với validation
 
-### 4. Qu?n L� Nh�n Vi�n
-- Th�m/S?a/X�a nh�n vi�n
-- Ph�n theo ph�ng ban v� ch?c v?
+### 4. Quản Lý Nhân Viên
+- Thêm/Sửa/Xóa nhân viên
+- Phân theo phòng ban và chức vụ
 
-## L?u � Quan Tr?ng
+## Lưu Ý Quan Trọng
 
 ### Encoding UTF-8
-?? **T?t c? c�c file .cs ph?i ???c l?u v?i encoding UTF-8** ?? x? l� ?�ng ti?ng Vi?t.
+⚠️ **Tất cả các file .cs phải được lưu với encoding UTF-8** để xử lý đúng tiếng Việt.
 
-Trong Visual Studio: `File` ? `Advanced Save Options` ? Ch?n `Unicode (UTF-8 with signature) - Codepage 65001`
+Trong Visual Studio: `File` → `Advanced Save Options` → Chọn `Unicode (UTF-8 with signature) - Codepage 65001`
 
-### Tr?ng Th�i Booking
-C�c gi� tr? chu?n:
-- `M?i ??t`
-- `Ch? thanh to�n`
-- `?� ??t c?c`
-- `?� x�c nh?n`
-- `Ho�n th�nh`
-- `?� h?y`
+### Trạng Thái Booking
+Các giá trị chuẩn:
+- `Mới đặt`
+- `Chờ thanh toán`
+- `Đã đặt cọc`
+- `Đã xác nhận`
+- `Hoàn thành`
+- `Đã hủy`
 
-### Ki?m Tra D? Li?u
+### Kiểm Tra Dữ Liệu
 ```sql
--- Ki?m tra s? l??ng b?ng
+-- Kiểm tra số lượng bảng
 SELECT COUNT(*) FROM user_tables;
 
--- Xem t?t c? tr?ng th�i booking
+-- Xem tất cả trạng thái booking
 SELECT DISTINCT Status FROM Bookings ORDER BY Status;
 
--- Ki?m tra function
-SELECT FN_CountBookingsByStatus('Ho�n th�nh') FROM DUAL;
+-- Kiểm tra function
+SELECT FN_CountBookingsByStatus('Hoàn thành') FROM DUAL;
 ```
 
-## C?u Tr�c Th? M?c
+## Cấu Trúc Thư Mục
 ```
 QLTourDuLich/
-??? Controllers/          # MVC Controllers
-??? Models/              # Entity Models
-??? Services/            # Business Logic Layer
-??? Views/               # Razor Views
-??? database/            # SQL Scripts
-?   ??? create_tablespace_and_users.sql
-?   ??? create_tables.sql
-?   ??? fix_sequences.sql
-?   ??? stored_procedures_functions.sql
-??? appsettings.json
-??? Program.cs
-??? README.md
+├── Controllers/          # MVC Controllers
+├── Models/              # Entity Models
+├── Services/            # Business Logic Layer
+├── Views/               # Razor Views
+├── database/            # SQL Scripts
+│   ├── create_tablespace_and_users.sql
+│   ├── create_tables.sql
+│   ├── fix_sequences.sql
+│   └── stored_procedures_functions.sql
+├── appsettings.json
+├── Program.cs
+└── README.md
 ```
 
-## Li�n H? & H? Tr?
-N?u g?p v?n ??, ki?m tra:
-1. Oracle service ?� ch?y ch?a
-2. Connection string ?�ng ch?a
-3. User c� ?? quy?n ch?a
-4. File encoding UTF-8 ch?a
+## Liên Hệ & Hỗ Trợ
+Nếu gặp vấn đề, kiểm tra:
+1. Oracle service đã chạy chưa
+2. Connection string đúng chưa
+3. User có đủ quyền chưa
+4. File encoding UTF-8 chưa
