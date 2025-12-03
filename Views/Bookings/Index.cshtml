@@ -1,0 +1,83 @@
+﻿@model IEnumerable<dynamic>
+
+@{
+    ViewData["Title"] = "Quản lý Đặt Tour";
+}
+
+<h1>Quản lý Đặt Tour</h1>
+
+<!-- Thống kê nhanh -->
+<div class="row mb-3">
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-clock-history"></i> Mới Đặt</h5>
+                <h2>@ViewBag.NewBookings</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-check-circle"></i> Đã Xác Nhận</h5>
+                <h2>@ViewBag.ConfirmedBookings</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-trophy"></i> Hoàn Thành</h5>
+                <h2>@ViewBag.CompletedBookings</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Tạo Đơn Đặt Mới
+    </a>
+</p>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Mã Đơn</th>
+                    <th>Khách Hàng</th>
+                    <th>Tour</th>
+                    <th>Ngày Khởi Hành</th>
+                    <th>Người Lớn</th>
+                    <th>Trẻ Em</th>
+                    <th>Tổng Tiền</th>
+                    <th>Trạng Thái</th>
+                    <th>Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.BookingId</td>
+                        <td>@item.CustomerName</td>
+                        <td>@item.TourName</td>
+                        <td>@(((DateTime)item.StartDate).ToString("dd/MM/yyyy"))</td>
+                        <td>@item.NumAdults</td>
+                        <td>@item.NumChildren</td>
+                        <td>@(((decimal)item.TotalAmount).ToString("N0")) VNĐ</td>
+                        <td>
+                            <span class="badge bg-info">@item.Status</span>
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.BookingId" class="btn btn-sm btn-info">Chi tiết</a>
+                            <a asp-action="Edit" asp-route-id="@item.BookingId" class="btn btn-sm btn-warning">Sửa</a>
+                            <a asp-action="Delete" asp-route-id="@item.BookingId" class="btn btn-sm btn-danger">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

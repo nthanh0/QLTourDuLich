@@ -1,0 +1,76 @@
+﻿@model QLTourDuLich.Models.Tour
+
+@{
+    ViewData["Title"] = "Chỉnh Sửa Tour";
+}
+
+<h1>Chỉnh Sửa Tour</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="TourId" />
+            
+            <div class="mb-3">
+                <label asp-for="TourName" class="form-label">Tên Tour</label>
+                <input asp-for="TourName" class="form-control" />
+                <span asp-validation-for="TourName" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="TourType" class="form-label">Loại Tour</label>
+                <select asp-for="TourType" class="form-control">
+                    <option value="">-- Chọn loại tour --</option>
+                    <option value="Miền Bắc">Miền Bắc</option>
+                    <option value="Miền Trung">Miền Trung</option>
+                    <option value="Miền Nam">Miền Nam</option>
+                    <option value="Biển đảo">Biển đảo</option>
+                    <option value="Nghỉ dưỡng">Nghỉ dưỡng</option>
+                    <option value="Toàn quốc">Toàn quốc</option>
+                </select>
+                <span asp-validation-for="TourType" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="BasePrice" class="form-label">Giá Cơ Bản (VNĐ)</label>
+                <input asp-for="BasePrice" class="form-control" type="number" />
+                <span asp-validation-for="BasePrice" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Duration" class="form-label">Thời Gian</label>
+                <input asp-for="Duration" class="form-control" placeholder="Ví dụ: 3 ngày 2 đêm" />
+                <span asp-validation-for="Duration" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Mô Tả</label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="ManagerId" class="form-label">Người Quản Lý</label>
+                <select asp-for="ManagerId" class="form-control">
+                    <option value="">-- Chọn người quản lý --</option>
+                    @foreach (var emp in ViewBag.Employees as List<QLTourDuLich.Models.Employee>)
+                    {
+                        <option value="@emp.EmployeeId">@emp.FullName - @emp.Position</option>
+                    }
+                </select>
+                <span asp-validation-for="ManagerId" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <input type="submit" value="Cập Nhật" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

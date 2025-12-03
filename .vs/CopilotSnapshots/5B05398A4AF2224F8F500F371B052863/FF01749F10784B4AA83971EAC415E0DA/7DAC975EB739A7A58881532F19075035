@@ -1,0 +1,233 @@
+﻿using Oracle.ManagedDataAccess.Client;
+using Oracle.ManagedDataAccess.Types;
+using QLTourDuLich.Models;
+using System.Data;
+
+namespace QLTourDuLich.Services
+{
+    public class BookingService
+    {
+        private readonly OracleDbService _dbService;
+
+        public BookingService(OracleDbService dbService)
+        {
+            _dbService = dbService;
+        }
+
+        public async Task<List<dynamic>> GetAllBookingsWithDetailsAsync()
+        {
+            var query = @"SELECT b.BookingId, c.FullName AS CustomerName, t.TourName, 
+                         ts.StartDate, b.TotalAmount, b.Status, b.NumAdults, b.NumChildren, b.BookingDate
+                         FROM Bookings b
+                         JOIN Customers c ON b.CustomerId = c.CustomerId
+                         JOIN TourSchedules ts ON b.ScheduleId = ts.ScheduleId
+                         JOIN Tours t ON ts.TourId = t.TourId
+                         ORDER BY b.BookingId DESC";
+            
+            return await _dbService.ExecuteQueryAsync(query, reader => new
+            {
+                BookingId = reader.GetInt32(0),
+                CustomerName = reader.GetString(1),
+                TourName = reader.GetString(2),
+                StartDate = reader.GetDateTime(3),
+                TotalAmount = reader.IsDBNull(4) ? 0 : reader.GetDecimal(4),
+                Status = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                NumAdults = reader.IsDBNull(6) ? 0 : reader.GetInt32(6),
+                NumChildren = reader.IsDBNull(7) ? 0 : reader.GetInt32(7),
+                BookingDate = reader.GetDateTime(8)
+            } as dynamic);
+        }
+
+        public async Task<List<Booking>> GetAllBookingsAsync()
+        {
+            var query = "SELECT BookingId, CustomerId, ScheduleId, BookingDate, NumAdults, NumChildren, TotalAmount, Status FROM Bookings ORDER BY BookingId DESC";
+            return await _dbService.ExecuteQueryAsync(query, reader => new Booking
+            {
+                BookingId = reader.GetInt32(0),
+                CustomerId = reader.GetInt32(1),
+                ScheduleId = reader.GetInt32(2),
+                BookingDate = reader.GetDateTime(3),
+                NumAdults = reader.IsDBNull(4) ? null : reader.GetInt32(4),
+                NumChildren = reader.IsDBNull(5) ? null : reader.GetInt32(5),
+                TotalAmount = reader.IsDBNull(6) ? null : reader.GetDecimal(6),
+                Status = reader.IsDBNull(7) ? null : reader.GetString(7)
+            });
+        }
+
+        public async Task<Booking?> GetBookingByIdAsync(int id)
+        {
+            var query = "SELECT BookingId, CustomerId, ScheduleId, BookingDate, NumAdults, NumChildren, TotalAmount, Status FROM Bookings WHERE BookingId = :id";
+            var parameters = new[] { new OracleParameter("id", id) };
+            var result = await _dbService.ExecuteQueryAsync(query, reader => new Booking
+            {
+                BookingId = reader.GetInt32(0),
+                CustomerId = reader.GetInt32(1),
+                ScheduleId = reader.GetInt32(2),
+                BookingDate = reader.GetDateTime(3),
+                NumAdults = reader.IsNull(4) ? null : reader.GetInt32(4),
+                NumChildren = reader.IsNull(5) ? null : reader.GetInt32(5),
+                TotalAmount = reader.IsNull(6) ? null : reader.GetDecimal(6),
+                Status = reader.IsNull(7) ? null : reader.GetString(7)
+            }, parameters);
+            return result.FirstOrDefault();
+        }
+
+        // SỬ DỤNG STORED PROCEDURE: SP_CreateBooking
+        public async Task<(int BookingId, decimal TotalAmount, string Message)> CreateBookingAsync(Booking booking)
+        {
+            return await Task.Run(() =>
+            {
+                using var connection = _dbService.GetConnection();
+                connection.Open();
+                
+                using var command = connection.CreateCommand();
+                command.CommandText = "SP_CreateBooking";
+                command.CommandType = CommandType.StoredProcedure;
+                
+                // Input parameters
+                command.Parameters.Add("p_CustomerId", OracleDbType.Int32).Value = booking.CustomerId;
+                command.Parameters.Add("p_ScheduleId", OracleDbType.Int32).Value = booking.ScheduleId;
+                command.Parameters.Add("p_NumAdults", OracleDbType.Int32).Value = booking.NumAdults ?? 0;
+                command.Parameters.Add("p_NumChildren", OracleDbType.Int32).Value = booking.NumChildren ?? 0;
+                
+                // Output parameters
+                var bookingIdParam = command.Parameters.Add("p_BookingId", OracleDbType.Int32);
+                bookingIdParam.Direction = ParameterDirection.Output;
+                
+                var totalAmountParam = command.Parameters.Add("p_TotalAmount", OracleDbType.Decimal);
+                totalAmountParam.Direction = ParameterDirection.Output;
+                
+                var messageParam = command.Parameters.Add("p_Message", OracleDbType.Varchar2, 500);
+                messageParam.Direction = ParameterDirection.Output;
+                
+                command.ExecuteNonQuery();
+                
+                int bookingId = bookingIdParam.Value != DBNull.Value ? Convert.ToInt32(bookingIdParam.Value.ToString()) : -1;
+                decimal totalAmount = totalAmountParam.Value != DBNull.Value ? Convert.ToDecimal(totalAmountParam.Value.ToString()) : 0;
+                string message = messageParam.Value?.ToString() ?? "Lỗi không xác định";
+                
+                return (bookingId, totalAmount, message);
+            });
+        }
+
+        public async Task<int> UpdateBookingAsync(Booking booking)
+        {
+            var query = @"UPDATE Bookings SET CustomerId = :custId, ScheduleId = :schedId, 
+                         NumAdults = :adults, NumChildren = :children, TotalAmount = :amount, Status = :status 
+                         WHERE BookingId = :id";
+            var parameters = new[]
+            {
+                new OracleParameter("custId", booking.CustomerId),
+                new OracleParameter("schedId", booking.ScheduleId),
+                new OracleParameter("adults", (object?)booking.NumAdults ?? DBNull.Value),
+                new OracleParameter("children", (object?)booking.NumChildren ?? DBNull.Value),
+                new OracleParameter("amount", (object?)booking.TotalAmount ?? DBNull.Value),
+                new OracleParameter("status", (object?)booking.Status ?? DBNull.Value),
+                new OracleParameter("id", booking.BookingId)
+            };
+            return await _dbService.ExecuteNonQueryAsync(query, parameters);
+        }
+
+        // SỬ DỤNG STORED PROCEDURE: SP_UpdateBookingStatus
+        public async Task<(int Success, string Message)> UpdateBookingStatusAsync(int bookingId, string newStatus)
+        {
+            return await Task.Run(() =>
+            {
+                using var connection = _dbService.GetConnection();
+                connection.Open();
+                
+                using var command = connection.CreateCommand();
+                command.CommandText = "SP_UpdateBookingStatus";
+                command.CommandType = CommandType.StoredProcedure;
+                
+                // Input parameters
+                command.Parameters.Add("p_BookingId", OracleDbType.Int32).Value = bookingId;
+                command.Parameters.Add("p_NewStatus", OracleDbType.NVarchar2).Value = newStatus;
+                
+                // Output parameters
+                var successParam = command.Parameters.Add("p_Success", OracleDbType.Int32);
+                successParam.Direction = ParameterDirection.Output;
+                
+                var messageParam = command.Parameters.Add("p_Message", OracleDbType.Varchar2, 500);
+                messageParam.Direction = ParameterDirection.Output;
+                
+                command.ExecuteNonQuery();
+                
+                int success = successParam.Value != DBNull.Value ? Convert.ToInt32(successParam.Value.ToString()) : 0;
+                string message = messageParam.Value?.ToString() ?? "Lỗi không xác định";
+                
+                return (success, message);
+            });
+        }
+
+        public async Task<int> DeleteBookingAsync(int id)
+        {
+            var query = "DELETE FROM Bookings WHERE BookingId = :id";
+            var parameters = new[] { new OracleParameter("id", id) };
+            return await _dbService.ExecuteNonQueryAsync(query, parameters);
+        }
+
+        // SỬ DỤNG FUNCTION: FN_CountBookingsByStatus
+        public async Task<int> CountBookingsByStatusAsync(string status)
+        {
+            return await Task.Run(() =>
+            {
+                using var connection = _dbService.GetConnection();
+                connection.Open();
+                
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT FN_CountBookingsByStatus(:status) FROM DUAL";
+                
+                var param = command.Parameters.Add("status", OracleDbType.NVarchar2);
+                param.Value = status;
+                
+                var result = command.ExecuteScalar();
+                return result != DBNull.Value ? Convert.ToInt32(result) : 0;
+            });
+        }
+        
+        // BACKUP METHOD: Đếm trực tiếp bằng query (dùng khi function không hoạt động)
+        public async Task<int> CountBookingsByStatusDirectAsync(string status)
+        {
+            var query = "SELECT COUNT(*) FROM Bookings WHERE UPPER(TRIM(Status)) = UPPER(TRIM(:status))";
+            var parameters = new[] { new OracleParameter("status", OracleDbType.NVarchar2) { Value = status } };
+            
+            return await Task.Run(() =>
+            {
+                using var connection = _dbService.GetConnection();
+                connection.Open();
+                
+                using var command = connection.CreateCommand();
+                command.CommandText = query;
+                command.Parameters.AddRange(parameters);
+                
+                var result = command.ExecuteScalar();
+                return result != DBNull.Value ? Convert.ToInt32(result) : 0;
+            });
+        }
+
+        // DEBUG: Lấy tất cả giá trị Status DISTINCT
+        public async Task<List<string>> GetDistinctStatusesAsync()
+        {
+            var query = "SELECT DISTINCT Status FROM Bookings WHERE Status IS NOT NULL ORDER BY Status";
+            return await _dbService.ExecuteQueryAsync(query, reader => reader.GetString(0));
+        }
+
+        // SỬ DỤNG FUNCTION: FN_GetAvailableSeats
+        public async Task<int> GetAvailableSeatsAsync(int scheduleId)
+        {
+            return await Task.Run(() =>
+            {
+                using var connection = _dbService.GetConnection();
+                connection.Open();
+                
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT FN_GetAvailableSeats(:scheduleId) FROM DUAL";
+                command.Parameters.Add("scheduleId", OracleDbType.Int32).Value = scheduleId;
+                
+                var result = command.ExecuteScalar();
+                return result != DBNull.Value ? Convert.ToInt32(result) : 0;
+            });
+        }
+    }
+}

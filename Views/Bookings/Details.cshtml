@@ -1,0 +1,42 @@
+﻿@model QLTourDuLich.Models.Booking
+
+@{
+    ViewData["Title"] = "Chi Tiết Đơn Đặt";
+}
+
+<h1>Chi Tiết Đơn Đặt Tour</h1>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Mã Đơn Đặt</dt>
+            <dd class="col-sm-9">@Model.BookingId</dd>
+            
+            <dt class="col-sm-3">Mã Khách Hàng</dt>
+            <dd class="col-sm-9">@Model.CustomerId</dd>
+            
+            <dt class="col-sm-3">Mã Lịch Trình</dt>
+            <dd class="col-sm-9">@Model.ScheduleId</dd>
+            
+            <dt class="col-sm-3">Ngày Đặt</dt>
+            <dd class="col-sm-9">@(Model.BookingDate.ToString("dd/MM/yyyy HH:mm"))</dd>
+            
+            <dt class="col-sm-3">Số Người Lớn</dt>
+            <dd class="col-sm-9">@Model.NumAdults</dd>
+            
+            <dt class="col-sm-3">Số Trẻ Em</dt>
+            <dd class="col-sm-9">@Model.NumChildren</dd>
+            
+            <dt class="col-sm-3">Tổng Tiền</dt>
+            <dd class="col-sm-9">@(Model.TotalAmount.HasValue ? Model.TotalAmount.Value.ToString("N0") + " VNĐ" : "")</dd>
+            
+            <dt class="col-sm-3">Trạng Thái</dt>
+            <dd class="col-sm-9"><span class="badge bg-info">@Model.Status</span></dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.BookingId" class="btn btn-warning">Chỉnh Sửa</a>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</div>

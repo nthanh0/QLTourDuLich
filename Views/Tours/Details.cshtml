@@ -1,0 +1,42 @@
+﻿@model QLTourDuLich.Models.Tour
+
+@{
+    ViewData["Title"] = "Chi Tiết Tour";
+}
+
+<h1>Chi Tiết Tour</h1>
+
+<div class="card">
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Mã Tour</dt>
+            <dd class="col-sm-9">@Model.TourId</dd>
+            
+            <dt class="col-sm-3">Tên Tour</dt>
+            <dd class="col-sm-9">@Model.TourName</dd>
+            
+            <dt class="col-sm-3">Loại Tour</dt>
+            <dd class="col-sm-9">@Model.TourType</dd>
+            
+            <dt class="col-sm-3">Giá Cơ Bản</dt>
+            <dd class="col-sm-9">@(Model.BasePrice.HasValue ? Model.BasePrice.Value.ToString("N0") + " VNĐ" : "")</dd>
+            
+            <dt class="col-sm-3">Thời Gian</dt>
+            <dd class="col-sm-9">@Model.Duration</dd>
+            
+            <dt class="col-sm-3">Mô Tả</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+            
+            <dt class="col-sm-3">Mã Người Quản Lý</dt>
+            <dd class="col-sm-9">@Model.ManagerId</dd>
+            
+            <dt class="col-sm-3"><strong>Tổng Doanh Thu</strong></dt>
+            <dd class="col-sm-9"><strong class="text-success">@(((decimal)ViewBag.Revenue).ToString("N0")) VNĐ</strong></dd>
+        </dl>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Edit" asp-route-id="@Model.TourId" class="btn btn-warning">Chỉnh Sửa</a>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</div>

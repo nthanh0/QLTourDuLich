@@ -1,0 +1,71 @@
+﻿@model QLTourDuLich.Models.Booking
+
+@{
+    ViewData["Title"] = "Tạo Đơn Đặt Tour";
+}
+
+<h1>Tạo Đơn Đặt Tour Mới</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="mb-3">
+                <label asp-for="CustomerId" class="form-label">Mã Khách Hàng</label>
+                <input asp-for="CustomerId" class="form-control" type="number" />
+                <span asp-validation-for="CustomerId" class="text-danger"></span>
+                <small class="form-text text-muted">Nhập mã khách hàng từ danh sách</small>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="ScheduleId" class="form-label">Mã Lịch Trình</label>
+                <input asp-for="ScheduleId" class="form-control" type="number" />
+                <span asp-validation-for="ScheduleId" class="text-danger"></span>
+                <small class="form-text text-muted">Nhập mã lịch trình tour</small>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="NumAdults" class="form-label">Số Người Lớn</label>
+                <input asp-for="NumAdults" class="form-control" type="number" min="0" />
+                <span asp-validation-for="NumAdults" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="NumChildren" class="form-label">Số Trẻ Em</label>
+                <input asp-for="NumChildren" class="form-control" type="number" min="0" />
+                <span asp-validation-for="NumChildren" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="TotalAmount" class="form-label">Tổng Tiền (VNĐ)</label>
+                <input asp-for="TotalAmount" class="form-control" type="number" />
+                <span asp-validation-for="TotalAmount" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Status" class="form-label">Trạng Thái</label>
+                <select asp-for="Status" class="form-control">
+                    <option value="">-- Chọn trạng thái --</option>
+                    <option value="Mới đặt">Mới đặt</option>
+                    <option value="Chờ thanh toán">Chờ thanh toán</option>
+                    <option value="Đã đặt cọc">Đã đặt cọc</option>
+                    <option value="Đã xác nhận">Đã xác nhận</option>
+                    <option value="Hoàn thành">Hoàn thành</option>
+                    <option value="Đã hủy">Đã hủy</option>
+                </select>
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <input type="submit" value="Tạo Đơn" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Trang Chủ";
+}
+
+<div class="text-center mb-5">
+    <h1 class="display-3">
+        <i class="bi bi-airplane-engines text-primary"></i>
+        Hệ Thống Quản Lý Tour Du Lịch
+    </h1>
+    <p class="lead">Giải pháp toàn diện cho việc quản lý tour du lịch</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-center h-100 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-map display-1 text-primary"></i>
+                <h5 class="card-title mt-3">Quản Lý Tours</h5>
+                <p class="card-text">Quản lý danh sách các tour du lịch, giá cả, lịch trình</p>
+                <a asp-controller="Tours" asp-action="Index" class="btn btn-primary">
+                    Xem Chi Tiết <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-center h-100 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-people display-1 text-success"></i>
+                <h5 class="card-title mt-3">Khách Hàng</h5>
+                <p class="card-text">Quản lý thông tin khách hàng, lịch sử đặt tour</p>
+                <a asp-controller="Customers" asp-action="Index" class="btn btn-success">
+                    Xem Chi Tiết <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-center h-100 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-ticket-perforated display-1 text-warning"></i>
+                <h5 class="card-title mt-3">Đặt Tour</h5>
+                <p class="card-text">Quản lý đơn đặt tour, thanh toán, trạng thái</p>
+                <a asp-controller="Bookings" asp-action="Index" class="btn btn-warning">
+                    Xem Chi Tiết <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-center h-100 shadow-sm">
+            <div class="card-body">
+                <i class="bi bi-person-badge display-1 text-info"></i>
+                <h5 class="card-title mt-3">Nhân Viên</h5>
+                <p class="card-text">Quản lý nhân viên, phân công công việc</p>
+                <a asp-controller="Employees" asp-action="Index" class="btn btn-info">
+                    Xem Chi Tiết <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

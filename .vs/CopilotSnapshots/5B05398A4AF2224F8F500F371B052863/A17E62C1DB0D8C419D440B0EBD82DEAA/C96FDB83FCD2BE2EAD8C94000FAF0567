@@ -1,0 +1,163 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using QLTourDuLich.Models;
+using QLTourDuLich.Services;
+using System.Linq;
+
+namespace QLTourDuLich.Controllers
+{
+    public class BookingsController : Controller
+    {
+        private readonly BookingService _bookingService;
+
+        public BookingsController(BookingService bookingService)
+        {
+            _bookingService = bookingService;
+        }
+
+        // GET: Bookings
+        public async Task<IActionResult> Index()
+        {
+            var bookings = await _bookingService.GetAllBookingsWithDetailsAsync();
+
+            // Debug: lấy tất cả các giá trị Status DISTINCT từ DB
+            var allStatuses = await _bookingService.GetDistinctStatusesAsync();
+            ViewBag.DebugStatuses = string.Join(", ", allStatuses.Select(s => $"'{s}' (Length: {s.Length})"));
+
+            // Debug chi tiết: hiển thị từng booking với status
+            var debugList = bookings.Select(b => 
+            {
+                string status = (b.Status as string) ?? "";
+                return $"ID:{b.BookingId}='{status}'";
+            }).ToList();
+            ViewBag.DebugBookings = string.Join(" | ", debugList);
+
+            // SỬ DỤNG FUNCTION FN_CountBookingsByStatus từ DB
+            // Đếm từng trạng thái riêng lẻ
+            int newCount = await _bookingService.CountBookingsByStatusAsync("Mới đặt");
+            int waitingPayment = await _bookingService.CountBookingsByStatusAsync("Chờ thanh toán");
+            int confirmedCount = await _bookingService.CountBookingsByStatusAsync("Đã xác nhận");
+            int depositCount = await _bookingService.CountBookingsByStatusAsync("Đã đặt cọc");
+            int completedCount = await _bookingService.CountBookingsByStatusAsync("Hoàn thành");
+
+            // Gộp các trạng thái liên quan
+            ViewBag.NewBookings = newCount + waitingPayment;  // Mới đặt + Chờ thanh toán
+            ViewBag.ConfirmedBookings = confirmedCount + depositCount;  // Đã xác nhận + Đã đặt cọc
+            ViewBag.CompletedBookings = completedCount;  // Hoàn thành
+
+            return View(bookings);
+        }
+
+        // GET: Bookings/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var booking = await _bookingService.GetBookingByIdAsync(id);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            // Lấy số chỗ còn trống
+            ViewBag.AvailableSeats = await _bookingService.GetAvailableSeatsAsync(booking.ScheduleId);
+
+            return View(booking);
+        }
+
+        // GET: Bookings/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: Bookings/Create - SỬ DỤNG SP_CreateBooking
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Booking booking)
+        {
+            if (ModelState.IsValid)
+            {
+                var (bookingId, totalAmount, message) = await _bookingService.CreateBookingAsync(booking);
+
+                if (bookingId > 0)
+                {
+                    TempData["SuccessMessage"] = $"{message} - Tổng tiền: {totalAmount:N0} VNĐ";
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = message;
+                }
+            }
+            return View(booking);
+        }
+
+        // GET: Bookings/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var booking = await _bookingService.GetBookingByIdAsync(id);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+            return View(booking);
+        }
+
+        // POST: Bookings/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Booking booking)
+        {
+            if (id != booking.BookingId)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                await _bookingService.UpdateBookingAsync(booking);
+                TempData["SuccessMessage"] = "Cập nhật booking thành công!";
+                return RedirectToAction(nameof(Index));
+            }
+            return View(booking);
+        }
+
+        // POST: Bookings/UpdateStatus - SỬ DỤNG SP_UpdateBookingStatus
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateStatus(int id, string newStatus)
+        {
+            var (success, message) = await _bookingService.UpdateBookingStatusAsync(id, newStatus);
+
+            if (success == 1)
+            {
+                TempData["SuccessMessage"] = message;
+            }
+            else
+            {
+                TempData["ErrorMessage"] = message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Bookings/Delete/5
+        public async Task<IActionResult> Delete(int id)
+        {
+            var booking = await _bookingService.GetBookingByIdAsync(id);
+            if (booking == null)
+            {
+                return NotFound();
+            }
+            return View(booking);
+        }
+
+        // POST: Bookings/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            await _bookingService.DeleteBookingAsync(id);
+            TempData["SuccessMessage"] = "Xóa booking thành công!";
+            return RedirectToAction(nameof(Index));
+        }
+    }
+}

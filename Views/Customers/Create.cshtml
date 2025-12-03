@@ -1,0 +1,61 @@
+﻿@model QLTourDuLich.Models.Customer
+
+@{
+    ViewData["Title"] = "Thêm Khách Hàng";
+}
+
+<h1>Thêm Khách Hàng Mới</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label">Họ Tên</label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" type="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Telephone" class="form-label">Điện Thoại</label>
+                <input asp-for="Telephone" class="form-control" />
+                <span asp-validation-for="Telephone" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Address" class="form-label">Địa Chỉ</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="DateOfBirth" class="form-label">Ngày Sinh</label>
+                <input asp-for="DateOfBirth" class="form-control" type="date" />
+                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="IdentityNum" class="form-label">CMND/CCCD</label>
+                <input asp-for="IdentityNum" class="form-control" />
+                <span asp-validation-for="IdentityNum" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <input type="submit" value="Thêm Mới" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
