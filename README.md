@@ -6,7 +6,6 @@
 - **ORM**: Oracle.ManagedDataAccess.Core
 
 ## Hướng Dẫn Tạo Cơ Sở Dữ Liệu
-### THAY `orcl` THÀNH TÊN INSTANCE ĐANG DÙNG
 
 ### Bước 1: Tạo Tablespace và User
 
@@ -48,6 +47,7 @@ Chạy file: `database/stored_procedures_functions.sql`
 - `FN_GetDaysUntilDeparture` - Số ngày đến ngày khởi hành
 
 ### Bước 4: Cấu Hình Connection String
+THAY `orcl` THÀNH TÊN INSTANCE ĐANG DÙNG
 Sửa file `appsettings.json`:
 
 ```json
