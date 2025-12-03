@@ -6,6 +6,7 @@
 - **ORM**: Oracle.ManagedDataAccess.Core
 
 ## Hướng Dẫn Tạo Cơ Sở Dữ Liệu
+### THAY `orcl` THÀNH TÊN INSTANCE ĐANG DÙNG
 
 ### Bước 1: Tạo Tablespace và User
 ```sql
@@ -34,12 +35,7 @@ Chạy file: `database/create_tables.sql`
 - `Accommodations`, `Itineraries`
 - `Itinerary_Locations`, `Itinerary_Services`, `Itinerary_Accommodations`
 
-### Bước 3: Sửa Sequences (nếu cần)
-Chạy file: `database/fix_sequences.sql`
-
-Đồng bộ giá trị sequence với MAX(ID) trong các bảng.
-
-### Bước 4: Tạo Stored Procedures và Functions
+### Bước 3: Tạo Stored Procedures và Functions
 Chạy file: `database/stored_procedures_functions.sql`
 
 **Procedures:**
@@ -59,7 +55,7 @@ Chạy file: `database/stored_procedures_functions.sql`
 - `FN_GetScheduleOccupancyRate` - % công suất đặt chỗ
 - `FN_GetDaysUntilDeparture` - Số ngày đến ngày khởi hành
 
-### Bước 5: Cấu Hình Connection String
+### Bước 4: Cấu Hình Connection String
 Sửa file `appsettings.json`:
 
 ```json
@@ -156,4 +152,5 @@ Nếu gặp vấn đề, kiểm tra:
 2. Connection string đúng chưa
 3. User có đủ quyền chưa
 4. File encoding UTF-8 chưa
+
 
